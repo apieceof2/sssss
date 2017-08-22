@@ -113,4 +113,42 @@ def edit_article(request):
     form = MyForm(request.POST, article)
 ```
 
-一个典型的CRUD（增删改查）界面函数
+一个典型的CRUD（增删改查）界面需要用户通过field将数据输入到对象中。Form对象需要包含对要上传的field的描述和验证规则，这些field的变量名就是对象中他们对应的变量名。form的第二个参数，obj，是用来在初始化视图函数的时候用来设置form默认属性的
+
+注意：当我们传输了一个对象作为数据源的时候，仅仅在这个数据的传输方式没有用POST的时候有效，如果在传输过程中只有POST，那么这个数据就会被忽略，这个是为了安全性和一致性。
+这个模式是很方便的，因为大多数长须不会把POST和GET请求分开来，在两个不同的视图函数中处理。
+
+一个构造的表单可以验证任何输入的数据，如果数据不可用就会抛出错误。通常，视图函数中的验证类似这样
+```python
+if request.POST and form.validate():
+    form.populate_obj(article)
+    article.save()
+    return redirect('/articles')
+```
+注意只有在POST请求的时候才会调用validate()。这么做的原因是因为当没有POST请求的时候（比如一个典型的CRUD表单），我们不想让程序抛出validation错误。
+
+在这个程序中，调用了populate_obj()来拷贝数据到article对象。然后重定向。这样做的原因是因为这种Post/Redirect/Get的模式是最好的选择。
+
+如果没有POST，或者说数据验证失败了。程序就会进行渲染。Form对象传输到模板中，它的参数可以用作渲染或者显示错误。
+
+```python
+return rensder('edit.html',form=form,article=article)
+```
+
+至此我们拥有了一个完整的简易编辑器Form，使用了WTForms的最佳方案。这并不是唯一的WTForms使用方式，只是一个展示了各个组件如何工作的说明。
+
+下面是试图函数全部的代码
+
+```python
+def edit_article(request):
+  article = Article.get(...)
+  form = MyForm(request.POST,article)
+  if request.POST and form.validate():
+    form.populate_obj(article)
+    article.save()
+    return redirect('/articles')
+  return render('edit.html',form=form,article=article)
+```
+
+
+
