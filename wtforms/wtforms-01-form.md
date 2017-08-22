@@ -137,7 +137,7 @@ return rensder('edit.html',form=form,article=article)
 
 至此我们拥有了一个完整的简易编辑器Form，使用了WTForms的最佳方案。这并不是唯一的WTForms使用方式，只是一个展示了各个组件如何工作的说明。
 
-下面是试图函数全部的代码
+下面是视图函数全部的代码
 
 ```python
 def edit_article(request):
